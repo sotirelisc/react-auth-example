@@ -2,7 +2,40 @@ const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
+const LocalStrategy = require('passport-local');
+
 const User = require('../models/user');
+
+const localOptions = {
+  // Use email for auth
+  usernameField: 'email'
+};
+// Create local strategy
+const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
+  // Verify username & password
+  User.findOne({ email: email}, (err, user) => {
+    if (err) {
+      return done(err);
+    }
+
+    if (!user) {
+      return done(null, false);
+    }
+
+    // Compare passwords
+    user.comparePassword(password, function(err, isMatch) {
+      if (err) {
+        return done(err);
+      }
+
+      if (!isMatch) {
+        return done(null, false);
+      }
+
+      return done(null, user);
+    });
+  })
+});
 
 // Setup options for JWT Strategy
 const jwtOptions = {
@@ -29,3 +62,4 @@ const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
 });
 
 passport.use(jwtLogin);
+passport.use(localLogin);

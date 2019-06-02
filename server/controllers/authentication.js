@@ -50,3 +50,10 @@ exports.signUp = (req, res, next) => {
       return next(error);
     });
 };
+
+exports.signIn = (req, res, next) => {
+  // User already auth'd, just give token
+  res.send({
+    token: tokenForUser(req.user)
+  });
+};
