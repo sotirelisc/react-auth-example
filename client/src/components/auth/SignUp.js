@@ -6,7 +6,9 @@ import { signUp } from '../../actions';
 
 class SignUp extends React.Component {
   onSubmit = formProps => {
-    this.props.signUp(formProps);
+    this.props.signUp(formProps, () => {
+      this.props.history.push('/feature');
+    });
   };
 
   render() {
@@ -31,15 +33,24 @@ class SignUp extends React.Component {
             component="input"
           />
         </fieldset>
+        <div>
+          {this.props.errorMessage}
+        </div>
         <button>Sign Up</button>
       </form>
     );
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    errorMessage: state.auth.errorMessage
+  };
+};
+
 // Combine HOCs
 export default compose(
-  connect(null, {
+  connect(mapStateToProps, {
     signUp
   }),
   reduxForm({
